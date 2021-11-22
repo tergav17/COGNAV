@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using COGNAV.Interface;
 
 namespace COGNAV.ARAP {
     public class Protocol {
@@ -28,10 +29,10 @@ namespace COGNAV.ARAP {
         }
 
         /**
-         * Calculates the size of an outgoing packet, includes the byte count, status, and CRC
+         * Calculates the size of an outgoing packet, excluding the byte count, status, and CRC
          */
         public static int CalculateSize(List<byte> contents) {
-            return 3 + contents.Count;
+            return contents.Count;
         }
 
         /**
@@ -40,7 +41,7 @@ namespace COGNAV.ARAP {
          */
         public static byte GenerateCyclicCheck(List<byte> message) {
 
-            int crc = 0;
+            int crc = 251;
             
             foreach (int b in message) {
 
@@ -50,6 +51,7 @@ namespace COGNAV.ARAP {
                 for (int i = 0; i < 8; i++) {
                     // Get the highest bit the the byte
                     int last = by & 0x80;
+					if (last != 0) last = 1;
                     
                     // Shift the current byte up
                     by = by << 1;
@@ -57,20 +59,21 @@ namespace COGNAV.ARAP {
                     // Shift it onto the CRC
                     crc = (crc << 1) | last;
 
-                    // Check bit 9 to see if it is on, if so do invert CRC bits
-                    if ((crc & 0x100) == 1) {
+                    // Check bit 9 to see if it is on, if so invert CRC bits
+                    if ((crc & 0x100) != 0) {
                         // XOR polynomial mask onto CRC
-                        crc = crc ^ PolyMask;
+                        
+                        crc ^= PolyMask;
                     }
                     
-                    // Just in case, slice up the CRC
-                    crc = crc & 0xFF;
+                    
                 }
             }
 
+            // Just in case, slice up the CRC
+            crc = crc & 0xFF;
             return Convert.ToByte(crc);
         }
-
 
     }
 }

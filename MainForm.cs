@@ -11,8 +11,13 @@ namespace COGNAV {
             //throw new System.NotImplementedException();
         }
 
-        private void button1_Click(object sender, EventArgs e) {
-            label1.Text = @"Eat Shit, and Piss ur pants";
+        private void MainForm_FormClosing(Object sender, FormClosingEventArgs e) {
+            Application.Exit();
+            Environment.Exit(0);
+        }
+
+        public System.Windows.Forms.RichTextBox GetGraphicConsole() {
+            return gConsole;
         }
     }
 }
