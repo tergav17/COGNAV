@@ -19,5 +19,17 @@ namespace COGNAV {
         public System.Windows.Forms.RichTextBox GetGraphicConsole() {
             return gConsole;
         }
+
+        public System.Windows.Forms.Label GetLeftStickLabel() {
+            return leftStickLabel;
+        }
+
+        public System.Windows.Forms.Label GetRightStickLabel() {
+            return rightStickLabel;
+        }
+
+        public System.Windows.Forms.ComboBox GetGamepadMenu() {
+            return gamepadSelection;
+        }
     }
 }

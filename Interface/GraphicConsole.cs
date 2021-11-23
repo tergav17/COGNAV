@@ -70,6 +70,8 @@ namespace COGNAV.Interface {
         private void HandleConsole() {
             // Crude method of doing polling, running with it anyways
 
+            AddLine(@"Starting Terminal Thread...");
+            
             while (_run) {
                 Thread.Sleep(10);
 
