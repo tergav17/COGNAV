@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Drawing;
 using System.Threading;
 
 namespace COGNAV.Interface {
@@ -7,82 +9,80 @@ namespace COGNAV.Interface {
 
         private readonly System.Windows.Forms.RichTextBox _gConsoleBox;
 
-        private volatile bool _run;
-        
-        private readonly ConcurrentQueue<string> _lineQueue = new ConcurrentQueue<string>();
-        private readonly ConcurrentQueue<char> _charQueue = new ConcurrentQueue<char>();
-
         /**
          * Allows for multiple threads to easily interface with a RichTextBox as a rudimentary console
          */
         public GraphicConsole(System.Windows.Forms.RichTextBox gc) {
             _gConsoleBox = gc;
-
-            Thread consoleThread = new Thread(new ThreadStart(this.HandleConsole));
-
-            _run = true;
-            
-            consoleThread.Start();
         }
 
         /**
-         * Method to queue in a line to display
+         * Method to put in a line to display
          */
         public void PutLine(string str) {
-            _lineQueue.Enqueue(str);
+            //_lineQueue.Enqueue(str);
+
+            void SafeLine() {
+                AddLine(str, Color.LightGray);
+            }
+            
+            _gConsoleBox.Invoke((Action) SafeLine);
+        }
+        
+        /**
+         * Method to put in a error to display
+         */
+        public void PutError(string str) {
+            //_lineQueue.Enqueue(str);
+
+            void SafeLine() {
+                AddLine(str, Color.Red);
+            }
+            
+            _gConsoleBox.Invoke((Action) SafeLine);
         }
 
         /**
-         * Method to queue in a char to display
+         * Method to put in a success to display
          */
-        public void PutChar(char ch) {
-            _charQueue.Enqueue(ch);
-        }
+        public void PutSuccess(string str) {
+            //_lineQueue.Enqueue(str);
 
+            void SafeLine() {
+                AddLine(str, Color.Lime);
+            }
+            
+            _gConsoleBox.Invoke((Action) SafeLine);
+        }
+        
         /**
-         * Terminate handler thread
+         * Method to put in a success to display
          */
-        public void Terminate() {
-            _run = false;
+        public void PutStartup(string str) {
+            //_lineQueue.Enqueue(str);
+
+            void SafeLine() {
+                AddLine(str, Color.Aqua);
+            }
+            
+            _gConsoleBox.Invoke((Action) SafeLine);
         }
 
         /**
          * Adds line to the text box
          */
-        private void AddLine(string str) {
-            string prior = _gConsoleBox.Text;
+        private void AddLine(string str, Color c) {
+            var pos = _gConsoleBox.TextLength;
 
-            _gConsoleBox.Text = prior + str + '\n';
-        }
-        
-        /**
-         * Adds char to text box
-         */
-        private void AddChar(char ch) {
-            string prior = _gConsoleBox.Text;
+            _gConsoleBox.AppendText(str + '\n');
 
-            _gConsoleBox.Text = prior + ch;
-        }
-
-        /**
-         * Constantly polls the line queue, and puts any lines found into the text box
-         */
-        private void HandleConsole() {
-            // Crude method of doing polling, running with it anyways
-
-            AddLine(@"Starting Terminal Thread...");
+            _gConsoleBox.SelectionStart = pos;
+            _gConsoleBox.SelectionLength = str.Length + 1;
+            _gConsoleBox.SelectionColor = c;
             
-            while (_run) {
-                Thread.Sleep(10);
+            _gConsoleBox.ScrollToCaret();
 
-                while (_lineQueue.TryDequeue(out var line)) { 
-                    AddLine(line); 
-                }
-
-                while (_charQueue.TryDequeue(out var ch)) {
-                    AddChar(ch);
-                }
-            }
+            _gConsoleBox.SelectionLength = 0;
         }
 
     }

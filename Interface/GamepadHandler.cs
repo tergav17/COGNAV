@@ -17,14 +17,18 @@ namespace COGNAV.Interface {
         private System.Windows.Forms.ComboBox _menu;
         
         public GamepadHandler(GraphicConsole graphicConsole, System.Windows.Forms.Label leftStickLabel, System.Windows.Forms.Label rightStickLabel, System.Windows.Forms.ComboBox menu) {
+            
+            // Your usual default value settings
             _run = true;
             _graphicConsole = graphicConsole;
             _leftStickLabel = leftStickLabel;
             _rightStickLabel = rightStickLabel;
             _menu = menu;
-
+            
+            // Create the thread
             Thread gamepadThread = new Thread(new ThreadStart(this.HandleGamepad));
 
+            // Start the thread
             gamepadThread.Start();
         }
 
@@ -33,6 +37,47 @@ namespace COGNAV.Interface {
          */
         public void Terminate() {
             _run = false;
+        }
+
+        /**
+         * Thread safe handling for setting menu text
+         */
+        private void SetMenuText(String str) {
+            
+            void DoSafe() {
+                _menu.Text = str;
+            }
+
+            _menu.Invoke((Action) DoSafe);
+
+        }
+        
+        /**
+         * Thread safe getting of menu text
+         */
+        private String GetMenuText() {
+            
+            String str = String.Empty;
+            
+            void DoSafe() {
+                str = _menu.Text;
+            }
+
+            _menu.Invoke((Action) DoSafe);
+
+            return str;
+        }
+
+        /**
+         * Thread safe adding of objects to menu
+         */
+        private void AddToMenu(String str) {
+            
+            void DoSafe() {
+                _menu.Items.Add(str);
+            }
+
+            _menu.Invoke((Action) DoSafe);
         }
 
         /**
@@ -49,28 +94,26 @@ namespace COGNAV.Interface {
         private void HandleGamepad() {
             
             // Set the default menu selection
-            _menu.Text = NoneString;
-            _menu.Items.Add(NoneString);
+            SetMenuText(NoneString);
+            AddToMenu(NoneString);
 
             // Make this the current selection too
-            _currentSelection = _menu.Text;
+            _currentSelection = GetMenuText();
 
             // Indicate Gamepad thread is starting up
-            _graphicConsole.PutLine("Starting Gamepad Thread...");
+            _graphicConsole.PutStartup("Starting Gamepad Thread...");
             
             // Make a DirectInput object for later use
             DirectInput directInput = new DirectInput();
 
             // Grab from gamepads
             foreach (var deviceInstance in directInput.GetDevices(DeviceType.Gamepad, DeviceEnumerationFlags.AllDevices)) {
-                _graphicConsole.PutLine("Pad");
-                _menu.Text = deviceInstance.InstanceName;
+                SetMenuText(deviceInstance.InstanceName);
             }
 
             // Grab from joysticks
             foreach (var deviceInstance in directInput.GetDevices(DeviceType.Joystick, DeviceEnumerationFlags.AllDevices)) {
-                _graphicConsole.PutLine("Stick");
-                _menu.Text = deviceInstance.InstanceName;
+                SetMenuText(deviceInstance.InstanceName);
             }
 
             // Create a null input object, will be acquired later
@@ -83,7 +126,7 @@ namespace COGNAV.Interface {
             while (_run) {
 
                 // Detect if a change in selection has occured
-                if (!_menu.Text.Equals(_currentSelection)) {
+                if (!GetMenuText().Equals(_currentSelection)) {
 
                     // If input isn't null...
                     if (input != null) {
@@ -93,7 +136,7 @@ namespace COGNAV.Interface {
                     }
                     
                     // Update current selection
-                    _currentSelection = _menu.Text;
+                    _currentSelection = GetMenuText();
                     
                     // If it isn't the NoneString, attempt to acquire the gamepad
                     if (!_currentSelection.Equals(NoneString)) {
@@ -114,14 +157,14 @@ namespace COGNAV.Interface {
                     // If an error occurs while trying to update, do the following:
                     
                     // Tell the user an error has occured
-                    _graphicConsole.PutLine("Gamepad Connection Lost!");
+                    _graphicConsole.PutError("Gamepad Connection Lost!");
                     
                     // Dispose and nullify the current object
                     input.Dispose();
                     input = null;
                     
                     // Set the current selection to the NoneString
-                    _menu.Text = NoneString;
+                    SetMenuText(NoneString);
                     _currentSelection = NoneString;
                 }
 
@@ -189,7 +232,7 @@ namespace COGNAV.Interface {
                 stick = new Joystick(directInput, joystickGuid);
                 stick.Properties.BufferSize = 128;
                 stick.Acquire();
-                _graphicConsole.PutLine("Acquired Joystick " + selection);
+                _graphicConsole.PutSuccess("Acquired Joystick " + selection);
             }
 
             return stick;
@@ -247,13 +290,13 @@ namespace COGNAV.Interface {
                 if (!item.Equals(NoneString)) {
                     
                     // Reset the current selection to the NoneString
-                    if (_menu.Text.Equals(item)) _menu.Text = NoneString;
+                    if (GetMenuText().Equals(item)) SetMenuText(NoneString);
                     _menu.Items.Remove(item);
                 }
 
             // If the menu doesn't have an option, add it
             foreach (var t in menuOptions) {
-                if (!_menu.Items.Contains(t)) _menu.Items.Add(t);
+                if (!_menu.Items.Contains(t)) AddToMenu(t);
             }
         }
 
@@ -300,7 +343,7 @@ namespace COGNAV.Interface {
             } catch (Exception e) {
                 // Uh oh, error!
                 // Put it on the console whatever it is
-                _graphicConsole.PutLine("Caught Error: " + e.Message);
+                _graphicConsole.PutError("Caught Error: " + e.Message);
                 
                 // And return false to indicate that an error has occured
                 // The main thread should drop this joystick NOW!

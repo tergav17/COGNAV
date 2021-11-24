@@ -35,7 +35,7 @@ namespace COGNAV.ARAP {
          * Connects to socket, and continually watches for incoming information
          */
         private void HandleCommunication() {
-            _graphicConsole.PutLine("Starting Communication Thread...");
+            _graphicConsole.PutStartup("Starting Communication Thread...");
 
             // Create IP endpoint at 192.168.1.1:288
             IPAddress ipAddr = System.Net.IPAddress.Parse("192.168.1.1");
@@ -53,7 +53,7 @@ namespace COGNAV.ARAP {
                     // Attempt to connect to socket
                     _graphicConsole.PutLine("Attempting Connection At " + endPoint.ToString()); 
                     connection.Connect(endPoint);
-                    _graphicConsole.PutLine("Connection Established");
+                    _graphicConsole.PutSuccess("Connection Established");
 
                     // Wait counter
                     int bypasses = 0;
@@ -96,7 +96,7 @@ namespace COGNAV.ARAP {
                 }
                 catch (SocketException) {
                     // Connection failure, clean up and attempt to reconnect
-                    _graphicConsole.PutLine("Connection Failure");
+                    _graphicConsole.PutError("Network Connection Error");
                     if (connection.Connected) connection.Disconnect(true);
                 }
 
