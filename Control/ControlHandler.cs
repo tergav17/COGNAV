@@ -73,6 +73,7 @@ namespace COGNAV.Control {
 
                 data.X = Math.Sin(count) * 5;
                 data.Y = Math.Cos(count) * 5;
+                data.Rotation = currX + currY;
                 
                 _drawOps.UpdateData(data);
 
