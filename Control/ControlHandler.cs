@@ -68,12 +68,10 @@ namespace COGNAV.Control {
 
                 EnvironmentalDataContainer data = new EnvironmentalDataContainer(0, 0, 0);
 
-                //data.X = currX;
-                //data.Y = currY;
-
-                data.X = Math.Sin(count) * 5;
-                data.Y = Math.Cos(count) * 5;
-                data.Rotation = currX + currY;
+                data.X = currY;
+                data.Y = 0;
+                
+                data.Rotation = currX;
                 
                 _drawOps.UpdateData(data);
 

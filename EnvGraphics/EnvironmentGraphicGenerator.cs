@@ -2,20 +2,29 @@
 using System.Drawing;
 
 namespace COGNAV.EnvGraphics {
-    public class EnvironmentGraphicGenerator {
+    public static class EnvironmentGraphicGenerator {
 
+        /**
+         * Constant land
+         */
+        
         private const int EWidth = 450;
         private const int EHeight = 450;
         private const int Scale = 10;
 
         private const int WidthScalar = EWidth / Scale;
         private const int HeightScalar = EHeight / Scale;
-
         private const int Extension = 2;
+
+        private const double CmPerSquare = 10;
+
+        private const double RobotRadius = 10;
 
         public static int DrawEnvironment(Image img, EnvironmentalDataContainer data) {
             Brush blackBrush = new SolidBrush(Color.Black);
             Pen gridPen = new Pen(Color.LightGreen, 2);
+
+            Pen robotPen = new Pen(Color.LightGray, 3);
 
             try {
 
@@ -45,6 +54,11 @@ namespace COGNAV.EnvGraphics {
                     
                     graphics.DrawLine(gridPen,start, end);
                 }
+                
+                // Draw robot
+                int robotWidth = (int) (WidthScalar * (RobotRadius / CmPerSquare));
+                int robotHeight = (int) (HeightScalar * (RobotRadius / CmPerSquare));
+                graphics.DrawEllipse(robotPen, (EWidth / 2) - (robotWidth / 2), (EHeight / 2) - (robotHeight / 2), robotWidth, robotHeight);
                 
 
             } catch {
