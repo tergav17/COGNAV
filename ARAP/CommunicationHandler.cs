@@ -84,13 +84,44 @@ namespace COGNAV.ARAP {
                             }
                         }
 
+                        // Create output queue
+                        List<byte> lbuf = new List<byte>();
+                        
                         // If the state machine has any outgoing information...
                         while (_psm.HasOutput()) {
+                            /*
                             byte[] buf = new byte[1];
-                            buf[0] = _psm.SendOutput();
 
+                            buf[0] = _psm.SendOutput();
+                                
                             // Send it off!
                             connection.Send(buf, 1, SocketFlags.None);
+
+                            // Debug Statement
+                            _graphicConsole.PutLine("Sent " + buf[0]);
+                            //Thread.Sleep(5);
+                            */
+                            
+                            lbuf.Add(_psm.SendOutput());
+
+                            //_graphicConsole.PutLine("Added byte to queue, size = " + lbuf.Count);
+                            
+                            if (!_psm.HasOutput()) {
+
+                                byte[] buf = new byte[lbuf.Count];
+
+                                for (int i = 0; i < lbuf.Count; i++) {
+                                    buf[i] = lbuf[i];
+                                }
+                                
+                                // Send it off!
+                                connection.Send(buf, lbuf.Count, SocketFlags.None);
+                                
+                                // Debug Statement
+                                //_graphicConsole.PutLine("Sent " + lbuf.Count + " bytes");
+                                Thread.Sleep(1);
+                            }
+                            
                         }
                     }
                 }

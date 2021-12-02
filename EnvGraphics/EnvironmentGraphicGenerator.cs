@@ -48,13 +48,44 @@ namespace COGNAV.EnvGraphics {
                     graphics.DrawLine(gridPen,start, end);
                 }
             
-                for (int i = ((int) (data.X * WidthScalar) % WidthScalar) - (WidthScalar * Extension); i < EWidth + (WidthScalar * Extension); i += WidthScalar) {
+                for (int i = ((int) (-data.X * WidthScalar) % WidthScalar) - (WidthScalar * Extension); i < EWidth + (WidthScalar * Extension); i += WidthScalar) {
                     Point start = Rotate(new Point(i, -(HeightScalar * Extension)), data.Rotation);
                     Point end = Rotate(new Point(i, EHeight + (HeightScalar * Extension)), data.Rotation);
                     
                     graphics.DrawLine(gridPen,start, end);
                 }
                 
+                // Draw all shapes
+                foreach (EnvironmentShape shape in data.Shapes) {
+
+                    // Create pen
+                    Pen shapePen = new Pen(shape.ShapeColor, 3);
+
+                    // Calculate integer location of object to be drawn
+                    Point iPoint = new Point((int) ((shape.X - data.X) * WidthScalar), (int) -((shape.Y - data.Y) * HeightScalar));
+
+                    iPoint.X = iPoint.X + (EWidth / 2);
+                    iPoint.Y = iPoint.Y + (EHeight / 2);
+
+                    int hw  = (int) ((shape.Width * WidthScalar) / 2);
+                    int hh = (int) ((shape.Height * HeightScalar) / 2);
+                    
+                    // Rotate that point
+                    Point dPoint = Rotate(iPoint, data.Rotation);
+
+                    // Do the actual drawing
+                    if (shape.ShapeGeometry == Shape.Circle) {
+                        graphics.DrawEllipse(shapePen, dPoint.X - hw, dPoint.Y - hh, hw * 2, hh * 2);
+                    } else if (shape.ShapeGeometry == Shape.Cross) {
+                        graphics.DrawLine(shapePen, dPoint.X - hw, dPoint.Y - hh, dPoint.X + hw, dPoint.Y + hh);
+                        graphics.DrawLine(shapePen, dPoint.X - hw, dPoint.Y + hh, dPoint.X + hw, dPoint.Y - hh);
+                    } else if (shape.ShapeGeometry == Shape.Square) {
+                        graphics.DrawRectangle(shapePen, dPoint.X - hw, dPoint.Y - hh, hw * 2, hh * 2);
+                    }
+
+                    shapePen.Dispose();
+                }
+
                 // Draw robot
                 int robotWidth = (int) (WidthScalar * (RobotRadius / CmPerSquare));
                 int robotHeight = (int) (HeightScalar * (RobotRadius / CmPerSquare));
