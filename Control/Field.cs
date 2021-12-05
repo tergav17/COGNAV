@@ -6,12 +6,14 @@ namespace COGNAV.Control {
 
         public List<Obstacle> Obstacles = new List<Obstacle>();
 
-        public List<PointF> NucleationPoints = new List<PointF>();
+        public List<Zone> ScannedAreas = new List<Zone>();
 
-        public double NorthFront = 2;
-        public double EastFront = 2;
-        public double SouthFront = -2;
-        public double WestFront = -2;
+        public List<Partition> Partitions = new List<Partition>();
+
+        public float NorthFront = -2;
+        public float EastFront = 2;
+        public float SouthFront = 2;
+        public float WestFront = -2;
 
     }
 }

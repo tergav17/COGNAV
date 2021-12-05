@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using COGNAV.Specs;
 
 namespace COGNAV.EnvGraphics {
     public static class EnvironmentGraphicGenerator {
@@ -8,17 +9,26 @@ namespace COGNAV.EnvGraphics {
          * Constant land
          */
         
+        // Number of squares wide
+        private const int Scale = 14;
+        
+        // Represented meters per square
+        private const double MetersPerSquare = 0.10;
+        
+        // Environment pixel width/height
         private const int EWidth = 450;
         private const int EHeight = 450;
-        private const int Scale = 10;
-
+        
+        // Adds extra lines out of bounds
+        private const int Extension = 3;
+        
+        /*
+         * Derivative Constants
+         */
         private const int WidthScalar = EWidth / Scale;
         private const int HeightScalar = EHeight / Scale;
-        private const int Extension = 2;
-
-        private const double CmPerSquare = 10;
-
-        private const double RobotRadius = 10;
+        private const double CmPerSquare = MetersPerSquare * 100;
+        private const double RobotRadius = Roomba.RoombaRadiusCm;
 
         public static int DrawEnvironment(Image img, EnvironmentalDataContainer data) {
             Brush blackBrush = new SolidBrush(Color.Black);
@@ -41,14 +51,14 @@ namespace COGNAV.EnvGraphics {
                 
                 
                 // Draw grid lines
-                for (int i = ((int) (data.Y * HeightScalar) % HeightScalar) - (HeightScalar * Extension); i < EHeight + (HeightScalar * Extension); i += HeightScalar) {
+                for (int i = ((int) ((data.Y / MetersPerSquare) * HeightScalar) % HeightScalar) - (HeightScalar * Extension); i < EHeight + (HeightScalar * Extension); i += HeightScalar) {
                     Point start = Rotate(new Point(-(WidthScalar * Extension), i), data.Rotation);
                     Point end = Rotate(new Point(EWidth + (WidthScalar * Extension), i), data.Rotation);
                     
                     graphics.DrawLine(gridPen,start, end);
                 }
             
-                for (int i = ((int) (-data.X * WidthScalar) % WidthScalar) - (WidthScalar * Extension); i < EWidth + (WidthScalar * Extension); i += WidthScalar) {
+                for (int i = ((int) (-(data.X / MetersPerSquare) * WidthScalar) % WidthScalar) - (WidthScalar * Extension); i < EWidth + (WidthScalar * Extension); i += WidthScalar) {
                     Point start = Rotate(new Point(i, -(HeightScalar * Extension)), data.Rotation);
                     Point end = Rotate(new Point(i, EHeight + (HeightScalar * Extension)), data.Rotation);
                     
@@ -62,16 +72,21 @@ namespace COGNAV.EnvGraphics {
                     Pen shapePen = new Pen(shape.ShapeColor, 3);
 
                     // Calculate integer location of object to be drawn
-                    Point iPoint = new Point((int) ((shape.X - data.X) * WidthScalar), (int) -((shape.Y - data.Y) * HeightScalar));
-
+                    Point iPoint = new Point((int) (((shape.X / MetersPerSquare) - (data.X / MetersPerSquare)) * WidthScalar), (int) -(((shape.Y / MetersPerSquare) - (data.Y / MetersPerSquare)) * HeightScalar));
+                    Point iPointEnd = new Point((int) (((shape.EndX / MetersPerSquare) - (data.X / MetersPerSquare)) * WidthScalar), (int) -(((shape.EndY / MetersPerSquare) - (data.Y / MetersPerSquare)) * HeightScalar));
+                    
                     iPoint.X = iPoint.X + (EWidth / 2);
                     iPoint.Y = iPoint.Y + (EHeight / 2);
+                    
+                    iPointEnd.X = iPointEnd.X + (EWidth / 2);
+                    iPointEnd.Y = iPointEnd.Y + (EHeight / 2);
 
-                    int hw  = (int) ((shape.Width * WidthScalar) / 2);
-                    int hh = (int) ((shape.Height * HeightScalar) / 2);
+                    int hw  = (int) (((shape.Width / MetersPerSquare) * WidthScalar) / 2);
+                    int hh = (int) (((shape.Height / MetersPerSquare) * HeightScalar) / 2);
                     
                     // Rotate that point
                     Point dPoint = Rotate(iPoint, data.Rotation);
+                    Point dPointEnd = Rotate(iPointEnd, data.Rotation);
 
                     // Do the actual drawing
                     if (shape.ShapeGeometry == Shape.Circle) {
@@ -81,15 +96,18 @@ namespace COGNAV.EnvGraphics {
                         graphics.DrawLine(shapePen, dPoint.X - hw, dPoint.Y + hh, dPoint.X + hw, dPoint.Y - hh);
                     } else if (shape.ShapeGeometry == Shape.Square) {
                         graphics.DrawRectangle(shapePen, dPoint.X - hw, dPoint.Y - hh, hw * 2, hh * 2);
+                    } else if (shape.ShapeGeometry == Shape.Line) {
+                        graphics.DrawLine(shapePen, dPoint, dPointEnd);
                     }
 
                     shapePen.Dispose();
                 }
 
                 // Draw robot
-                int robotWidth = (int) (WidthScalar * (RobotRadius / CmPerSquare));
-                int robotHeight = (int) (HeightScalar * (RobotRadius / CmPerSquare));
+                int robotWidth = (int) (WidthScalar * ((RobotRadius*2) / CmPerSquare));
+                int robotHeight = (int) (HeightScalar * ((RobotRadius*2) / CmPerSquare));
                 graphics.DrawEllipse(robotPen, (EWidth / 2) - (robotWidth / 2), (EHeight / 2) - (robotHeight / 2), robotWidth, robotHeight);
+                graphics.DrawLine(robotPen, (EWidth / 2), (EHeight / 2), (EWidth / 2), (EHeight / 2) - robotHeight/2);
                 
 
             } catch {

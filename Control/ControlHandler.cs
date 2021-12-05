@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using COGNAV.EnvGraphics;
 using COGNAV.Interface;
+using COGNAV.Specs;
 
 namespace COGNAV.Control {
     public class ControlHandler {
@@ -58,22 +60,27 @@ namespace COGNAV.Control {
 
             _graphicConsole.PutStartup("Starting Controller Thread...");
 
-            double count = 0;
+            Field testField = new Field();
+            
+            testField.Obstacles.Add(new Obstacle(0, 0.8F, .2F));
+
+            List<PathNode> path = PathFinder.FindPath(new PathNode(0, 0), new PathNode(0, 1.6F), testField, _graphicConsole);
+
+            path = PathFinder.ReducePath(path, testField);
+            
+            if (path != null) {
+                _graphicConsole.PutSuccess("Found path with distance of " + path.Count + " nodes");
+            }
+            else _graphicConsole.PutError("Pathfinding failure!");
 
             while (_run) {
-
-                count += 0.01;
+                
 
                 EnvironmentalDataContainer data = new EnvironmentalDataContainer(0, 0, 0);
 
-                //data.X = 10 * Math.Cos(count);
-                //data.Y = 10 * Math.Sin(count);
-                
-                //data.Rotation = Math.Sin(count / 10);
-
                 _controlRegister.RobotRot = _controlRegister.RobotRot + (_gamepad.RightStick * 1.5F);
 
-                (float X, float Y) displacement = DisplacementHelper.CalculateDisplacement(_gamepad.LeftStick / 10, _controlRegister.RobotRot);
+                (float X, float Y) displacement = DisplacementHelper.CalculateDisplacement(_gamepad.LeftStick / 100, _controlRegister.RobotRot);
 
                 _controlRegister.RobotX = _controlRegister.RobotX + displacement.X;
                 _controlRegister.RobotY = _controlRegister.RobotY + displacement.Y;
@@ -81,8 +88,29 @@ namespace COGNAV.Control {
                 data.Rotation = DisplacementHelper.ToRadians(_controlRegister.RobotRot);
                 data.X = _controlRegister.RobotX;
                 data.Y = _controlRegister.RobotY;
-                
-                data.Shapes.Add(new EnvironmentShape(0, 1, 1, 1) );
+
+                if (!PathHelper.DoesPointCollide(new PointF(0F, 0.8F),
+                    new PointF(_controlRegister.RobotX, _controlRegister.RobotY), Roomba.RoombaRadiusMeters)) {
+
+                    data.Shapes.Add(new EnvironmentShape(0, .8, 0.2, 0.2));
+
+                }
+
+                PathNode last = null;
+                if (path != null) foreach (PathNode n in path) {
+                    if (last != null) {
+                        EnvironmentShape line = new EnvironmentShape(n.X, n.Y, 0F, 0F);
+                        line.EndX = last.X;
+                        line.EndY = last.Y;
+                        line.ShapeGeometry = Shape.Line;
+                        line.ShapeColor = Color.Aqua;
+                        
+                        data.Shapes.Add(line);
+                    }
+
+                    last = n;
+
+                }
                 
                 _drawOps.UpdateData(data);
 

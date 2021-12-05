@@ -22,7 +22,7 @@
 
         public Obstacle(float x, float y, float diameter) {
             X = x;
-            Y = Y;
+            Y = y;
             Diameter = diameter;
 
             Type = ObstacleClass.Blip;
