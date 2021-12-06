@@ -33,16 +33,25 @@ namespace COGNAV.Control {
                     shape.ShapeColor = Color.Silver;
                     
                     output.Add(shape);
-                } else if (obj.Type == ObstacleClass.Short) {
-                    // Create Short Shape
+                } else if (obj.Type == ObstacleClass.Thin) {
+                    // Create Thin Shape
                     EnvironmentShape shape = new EnvironmentShape(obj.X, obj.Y, obj.Diameter, obj.Diameter);
 
                     shape.ShapeGeometry = Shape.Circle;
                     shape.ShapeColor = Color.Gold;
                     
                     output.Add(shape);
-                } else if (obj.Type == ObstacleClass.Hole) {
+                } else if (obj.Type == ObstacleClass.Short) {
                     // Create Short Shape
+                    EnvironmentShape shape = new EnvironmentShape(obj.X, obj.Y, obj.Diameter, obj.Diameter);
+
+                    shape.ShapeGeometry = Shape.Circle;
+                    shape.ShapeColor = Color.Brown;
+                    
+                    output.Add(shape);
+                }
+                else if (obj.Type == ObstacleClass.Hole) {
+                    // Create Hole Shape
                     EnvironmentShape shape = new EnvironmentShape(obj.X, obj.Y, obj.Diameter, obj.Diameter);
 
                     shape.ShapeGeometry = Shape.Square;
@@ -50,7 +59,7 @@ namespace COGNAV.Control {
                     
                     output.Add(shape);
                 } else if (obj.Type == ObstacleClass.Tape) {
-                    // Create Short Shape
+                    // Create Tape Shape
                     EnvironmentShape shape = new EnvironmentShape(obj.X, obj.Y, obj.Diameter, obj.Diameter);
 
                     shape.ShapeGeometry = Shape.Cross;

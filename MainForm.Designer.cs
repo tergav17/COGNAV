@@ -20,7 +20,7 @@ namespace COGNAV {
         }
 
         #region Windows Form Designer generated code
-        
+
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -34,6 +34,10 @@ namespace COGNAV {
             this.gamepadDivider = new System.Windows.Forms.Label();
             this.gamepadInput = new System.Windows.Forms.Label();
             this.redrawTimer = new System.Timers.Timer();
+            this.scanButton = new System.Windows.Forms.Button();
+            this.teleopButton = new System.Windows.Forms.Button();
+            this.autoButton = new System.Windows.Forms.Button();
+            this.isrLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize) (this.environmentViewer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize) (this.redrawTimer)).BeginInit();
             this.SuspendLayout();
@@ -109,11 +113,56 @@ namespace COGNAV {
             this.redrawTimer.SynchronizingObject = this;
             this.redrawTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.redrawTimer_Elapsed);
             // 
+            // scanButton
+            // 
+            this.scanButton.Location = new System.Drawing.Point(278, 104);
+            this.scanButton.Name = "scanButton";
+            this.scanButton.Size = new System.Drawing.Size(147, 40);
+            this.scanButton.TabIndex = 9;
+            this.scanButton.Text = "Manual Scan";
+            this.scanButton.UseVisualStyleBackColor = true;
+            this.scanButton.Click += new System.EventHandler(this.scanButton_Click);
+            // 
+            // teleopButton
+            // 
+            this.teleopButton.Location = new System.Drawing.Point(277, 58);
+            this.teleopButton.Name = "teleopButton";
+            this.teleopButton.Size = new System.Drawing.Size(147, 40);
+            this.teleopButton.TabIndex = 10;
+            this.teleopButton.Text = "TeleOp Mode";
+            this.teleopButton.UseVisualStyleBackColor = true;
+            this.teleopButton.Click += new System.EventHandler(this.teleopButton_Click);
+            // 
+            // autoButton
+            // 
+            this.autoButton.Location = new System.Drawing.Point(277, 12);
+            this.autoButton.Name = "autoButton";
+            this.autoButton.Size = new System.Drawing.Size(147, 40);
+            this.autoButton.TabIndex = 11;
+            this.autoButton.Text = "Autonomous Mode";
+            this.autoButton.UseVisualStyleBackColor = true;
+            this.autoButton.Click += new System.EventHandler(this.autoButton_Click);
+            // 
+            // isrLabel
+            // 
+            this.isrLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.isrLabel.Location = new System.Drawing.Point(277, 147);
+            this.isrLabel.Name = "isrLabel";
+            this.isrLabel.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.isrLabel.Size = new System.Drawing.Size(147, 28);
+            this.isrLabel.TabIndex = 12;
+            this.isrLabel.Text = "Current Instruction:\r\nNO CTRL THREAD";
+            this.isrLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(894, 475);
+            this.Controls.Add(this.isrLabel);
+            this.Controls.Add(this.autoButton);
+            this.Controls.Add(this.teleopButton);
+            this.Controls.Add(this.scanButton);
             this.Controls.Add(this.gamepadInput);
             this.Controls.Add(this.gamepadDivider);
             this.Controls.Add(this.environmentViewer);
@@ -132,6 +181,12 @@ namespace COGNAV {
             ((System.ComponentModel.ISupportInitialize) (this.redrawTimer)).EndInit();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Label isrLabel;
+
+        private System.Windows.Forms.Button autoButton;
+        private System.Windows.Forms.Button scanButton;
+        private System.Windows.Forms.Button teleopButton;
 
         private System.Timers.Timer redrawTimer;
 

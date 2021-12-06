@@ -11,31 +11,33 @@ namespace COGNAV.Control {
         private const int South = 2;
         private const int West = 3;
 
-        private const float Spacing = 0.01F;
+        private const float Spacing = 0.02F;
         private const float Safety = 0.03F;
 
 
         /**
          * Calculates the next vector that the robot should move to
          */ 
-        public static (float, float, bool) GetNextTrajectory(List<PathNode> path, Field f) {
+        public static (float, float, bool) GetNextTrajectory(List<PathNode> path, PointF position, Field f) {
             (float Direction, float Distance, bool DoScan) output = (0F, 0F, false);
             
             if (path == null) return (0, 0, false);
             if (path.Count == 0) return (0, 0, false);
-
+            
             PathNode goal = path[0];
 
             // Find the goal point to point towards
             for (int i = 1; i < path.Count; i++) {
-                if (!PathHelper.IsSegmentTraversable(new PointF(goal.X, goal.Y), new PointF(path[i].X, path[i].Y), f.Obstacles, Safety / 2F)) {
-                    if (PathHelper.Distance(new PointF(goal.X, goal.Y), new PointF(path[i].X, path[i].Y)) > 0.05) {
+                // Checks if the current path is traversable
+                if (!PathHelper.IsSegmentTraversable(position, new PointF(path[i].X, path[i].Y), f.Obstacles, Safety / 2F)) {
+                    if (PathHelper.Distance(position, new PointF(path[i].X, path[i].Y)) < 0.05) {
                         goal = path[i];
                     } else {
                         i = path.Count;
                         output.DoScan = false;
                     }
                 } else {
+                    // Going into an unknown area triggers a scan
                     if (PathHelper.IsPointKnown(new PointF(path[i].X, path[i].Y), f.ScannedAreas)) {
                         goal = path[i];
                     } else {
@@ -44,6 +46,10 @@ namespace COGNAV.Control {
                     }
                 }
             }
+
+            // Create trajectory
+            output.Direction = PathHelper.GetDirection(goal.X - position.X, goal.Y - position.Y);
+            output.Distance = PathHelper.DistanceF(position, new PointF(goal.X, goal.Y));
 
             return output;
         }

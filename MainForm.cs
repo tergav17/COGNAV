@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Timers;
 using System.Windows.Forms;
+using COGNAV.Control;
 using COGNAV.EnvGraphics;
 
 namespace COGNAV {
     public partial class MainForm : Form {
 
         private EnvironmentRedrawHandler _drawOps;
+        
+        public ControlHandler Control = null;
         
         public MainForm() {
             InitializeComponent();
@@ -45,6 +48,22 @@ namespace COGNAV {
 
         public EnvironmentRedrawHandler GetEnvironmentRedrawHandler() {
             return _drawOps;
+        }
+
+        public System.Windows.Forms.Label GetIsrLabel() {
+            return isrLabel;
+        }
+
+        private void autoButton_Click(object sender, EventArgs e) {
+            if (Control != null) Control.Task = 1;
+        }
+
+        private void teleopButton_Click(object sender, EventArgs e) {
+            if (Control != null) Control.Task = 2;
+        }
+
+        private void scanButton_Click(object sender, EventArgs e) {
+            if (Control != null) Control.ManualScan = 1;
         }
     }
 }

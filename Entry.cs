@@ -32,7 +32,9 @@ namespace COGNAV {
 
             GamepadHandler gh = new GamepadHandler(gc, mf.GetLeftStickLabel(), mf.GetRightStickLabel(), mf.GetGamepadMenu());
 
-            ControlHandler con = new ControlHandler(gc, mf.GetEnvironmentRedrawHandler(), gh);
+            ControlHandler con = new ControlHandler(gc, mf.GetEnvironmentRedrawHandler(), mf.GetIsrLabel(), gh);
+
+            mf.Control = con;
             
             CommunicationHandler ch = new CommunicationHandler(gc, con.GetRegisterAdapter());
         }

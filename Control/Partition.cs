@@ -6,7 +6,7 @@ namespace COGNAV.Control {
     public class Partition {
 
         public const int NumBranches = 24;
-        public const int Spread = 2;
+        public const int Spread = 3;
         
         public float X { get; set; }
         
@@ -22,6 +22,18 @@ namespace COGNAV.Control {
             Radius = radius;
 
             for (int i = 0; i < NumBranches; i++) Branches[i] = true;
+        }
+
+        /**
+         * Zaps a zone on the branches array, plus an amount of spread
+         */
+        public void ZapBranch(int branch) {
+            // Zap all branches
+            for (int i = 0; i < Spread; i++) {
+                Branches[(branch + i) % NumBranches] = false;
+                Branches[(branch - i) % NumBranches] = false;
+            }
+
         }
 
         /**

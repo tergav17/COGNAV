@@ -10,6 +10,26 @@ namespace COGNAV.Control {
 
 
         /**
+         * Calculates to total score of a specific point in the field
+         */
+        public static float CalculateScore(PointF point, Field f) {
+            double score = 0;
+
+            foreach (Partition part in f.Partitions) {
+                score = score + Proximity(point, new PointF(part.X, part.Y));
+            }
+
+            foreach (Obstacle obj in f.Obstacles) {
+                if (obj.Type == ObstacleClass.Hole || obj.Type == ObstacleClass.Tape) {
+                    score = score + Proximity(point, new PointF(obj.X, obj.Y));
+                }
+            }
+
+            return Convert.ToSingle(score);
+        }
+
+
+        /**
          * Gets the angle of a line starting at 0,0 and going to X,Y
          */
         public static float GetDirection(float x, float y) {
@@ -38,10 +58,10 @@ namespace COGNAV.Control {
          */
         public static bool IsPointKnown(PointF point, List<Zone> zones) {
             foreach (Zone zone in zones) {
-                if (DoesPointCollide(point, new PointF(zone.X, zone.Y),  zone.Radius)) return false;
+                if (DoesPointCollide(point, new PointF(zone.X, zone.Y),  zone.Radius)) return true;
             }
 
-            return true;
+            return false;
         }
 
 
@@ -118,6 +138,12 @@ namespace COGNAV.Control {
             return Math.Sqrt(((end.X - start.X) * (end.X - start.X)) + ((end.Y - start.Y) * (end.Y - start.Y)));
         }
 
+        /**
+         * Calculates the proximity of an object
+         */
+        public static double Proximity(PointF start, PointF end) {
+            return Math.Sqrt((end.X - start.X) + (end.Y - start.Y));
+        }
         /**
          * Calculates float distance
          */
