@@ -37,7 +37,7 @@ namespace COGNAV.Control {
 
             _run = true;
 
-            _controlRegister = new ControlRegisterAdapter(_gamepad);
+            _controlRegister = new ControlRegisterAdapter(_gamepad, gc);
             
             Thread controlThread = new Thread(new ThreadStart(this.HandleControl));
             
@@ -104,11 +104,14 @@ namespace COGNAV.Control {
 
                 if (ManualScan > 0) {
                     DoIsr(3);
-                    PopAllNewObstacles();
 
                     ManualScan = 0;
                 }
 
+                PopAllNewObstacles();
+                
+                //_graphicConsole.PutLine(_controlRegister.RobotX + ", " + _controlRegister.RobotY);
+                
                 Thread.Sleep(10);
             }
         }
@@ -431,6 +434,8 @@ namespace COGNAV.Control {
             bool hasWall = false;
 
             while (!_controlRegister.RobotObstacleQueue.IsEmpty) {
+                //_graphicConsole.PutLine("Popping New Object...");
+                
                 _controlRegister.RobotObstacleQueue.TryDequeue(out Obstacle obstacle);
                 if (obstacle == null) continue;
 
@@ -475,6 +480,7 @@ namespace COGNAV.Control {
                     }
                 }
                 
+                //_graphicConsole.PutLine("New Object Added To Field");
                 _field.Obstacles.Add(obstacle);
 
                 if (obstacle.Type == ObstacleClass.Hole || obstacle.Type == ObstacleClass.Tape) hasWall = true;

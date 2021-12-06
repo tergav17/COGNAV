@@ -8,7 +8,7 @@ namespace COGNAV.Control {
 
             float rAngle = ToRadians(angle);
 
-            output.XOut = -Convert.ToSingle((dis * Math.Sin(rAngle)));
+            output.XOut = Convert.ToSingle((dis * Math.Sin(rAngle)));
             output.YOut = Convert.ToSingle((dis * Math.Cos(rAngle)));
 
             return output;

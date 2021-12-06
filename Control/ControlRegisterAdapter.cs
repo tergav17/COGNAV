@@ -23,9 +23,13 @@ namespace COGNAV.Interface {
         private float _objectDistance = 0;
         private float _objectWidth = 0;
         public ConcurrentQueue<Obstacle> RobotObstacleQueue = new ConcurrentQueue<Obstacle>();
+
+        private GraphicConsole _graphicConsole;
         
-        public ControlRegisterAdapter(GamepadHandler gamepad) {
+        public ControlRegisterAdapter(GamepadHandler gamepad, GraphicConsole console) {
             _gamepad = gamepad;
+            _graphicConsole = console;
+            
             RobotX = 0;
             RobotY = 0;
             RobotRot = 0;
@@ -118,6 +122,8 @@ namespace COGNAV.Interface {
 
         public int WriteRegister(int register, List<byte> argsIn) {
 
+            //if (register > 3) _graphicConsole.PutLine("Writing to high register");
+            
             if (register == 1) {
                 // Instruction acknowledge 
                 
@@ -165,6 +171,9 @@ namespace COGNAV.Interface {
 
                 return 0;
             } else if (register == 7) {
+                
+                //_graphicConsole.PutError("Write to register 7");
+                
                 // Update object type register
                 if (argsIn.Count > 0) {
                     byte objState = argsIn[0];
@@ -173,6 +182,8 @@ namespace COGNAV.Interface {
 
                     Obstacle obj = new Obstacle(RobotX + x, RobotY + y, _objectWidth);
 
+                    _graphicConsole.PutLine("Found Object At: " + obj.X + ", " + obj.Y);
+                    
                     if (objState == 0x00) obj.Type = ObstacleClass.Blip;
                     if (objState == 0x01) obj.Type = ObstacleClass.Blob;
                     if (objState == 0x02) obj.Type = ObstacleClass.Wide;
@@ -180,6 +191,8 @@ namespace COGNAV.Interface {
                     if (objState == 0x04) obj.Type = ObstacleClass.Short;
                     if (objState == 0x05) obj.Type = ObstacleClass.Tape;
                     if (objState == 0x06) obj.Type = ObstacleClass.Hole;
+                    
+                    RobotObstacleQueue.Enqueue(obj);
                 }
 
                 return 0;

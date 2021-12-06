@@ -140,8 +140,8 @@ namespace COGNAV.EnvGraphics {
             double dy = p.Y - (EHeight / 2.0);
 
             // Rotate
-            double dxR = (dx * Math.Cos(rot)) - (dy * Math.Sin(rot));
-            double dyR = (dx * Math.Sin(rot)) + (dy * Math.Cos(rot));
+            double dxR = (dx * Math.Cos(-rot)) - (dy * Math.Sin(-rot));
+            double dyR = (dx * Math.Sin(-rot)) + (dy * Math.Cos(-rot));
                 
             // Translate back to mid
             dx = dxR +  (EWidth / 2.0);

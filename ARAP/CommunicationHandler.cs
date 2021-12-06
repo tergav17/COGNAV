@@ -119,7 +119,7 @@ namespace COGNAV.ARAP {
                                 
                                 // Debug Statement
                                 //_graphicConsole.PutLine("Sent " + lbuf.Count + " bytes");
-                                Thread.Sleep(1);
+                                //Thread.Sleep(1);
                             }
                             
                         }
