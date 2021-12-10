@@ -102,11 +102,18 @@ namespace COGNAV.Control {
 
             while (_run) {
 
-                if (ManualScan > 0) {
+                if (_gamepad.ButtonDown) ManualScan = 1;
+
+                if (_gamepad.WinDown) DoIsr(7);
+
+                    if (ManualScan > 0) {
                     DoIsr(3);
+                    _field.ScannedAreas.Add(new Zone(_controlRegister.RobotX, _controlRegister.RobotY, 0.7F));
 
                     ManualScan = 0;
                 }
+                
+                
 
                 PopAllNewObstacles();
                 
@@ -552,6 +559,14 @@ namespace COGNAV.Control {
             data.Y = _controlRegister.RobotY;
             
             data.Shapes = ObstacleHelper.BuildEnvironmentShapes(_field);
+
+            foreach (Zone z in _field.ScannedAreas) {
+                EnvironmentShape zone = new EnvironmentShape(z.X, z.Y, z.Radius * 2, z.Radius * 2);
+                zone.ShapeGeometry = Shape.Circle;
+                zone.ShapeColor = Color.Green;
+                
+                data.Shapes.Insert(0, zone);
+            }
 
             PathNode last = null;
             if (_currentPath != null) foreach (PathNode n in _currentPath) {

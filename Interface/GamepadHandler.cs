@@ -8,6 +8,8 @@ namespace COGNAV.Interface {
 
         public volatile float LeftStick = 0;
         public volatile float RightStick = 0;
+        public volatile bool ButtonDown = false;
+        public volatile bool WinDown = false;
         
         private volatile bool _run;
 
@@ -173,6 +175,8 @@ namespace COGNAV.Interface {
                 if (_currentSelection.Equals(NoneString)) {
                     RightStick = 0;
                     LeftStick = 0;
+                    ButtonDown = false;
+                    WinDown = false;
                     
                     // Update the status label too, just for good measure
                     _leftStickLabel.Text = @"Left Stick: " + LeftStick.ToString("0.00");
@@ -338,6 +342,15 @@ namespace COGNAV.Interface {
                     // Update the status label too, just for good measure
                     _leftStickLabel.Text = @"Left Stick: " + LeftStick.ToString("0.00");
                     _rightStickLabel.Text = @"Right Stick: " + RightStick.ToString("0.00");
+                    
+                    // Obtain button status
+                    if (state.Offset == JoystickOffset.Buttons0) {
+                        ButtonDown = (state.Value > 0);
+                    }
+
+                    if (state.Offset == JoystickOffset.Buttons3) {
+                        WinDown = (state.Value > 0);
+                    }
                 }
 
             } catch (Exception e) {
